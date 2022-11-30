@@ -5,7 +5,19 @@ synthetic fabric in continuous rolls of uniform width, is given as
 x 0 1 2 3 4
 p(x) 0.41 0.37 0.16 0.05 0.01
 Find the average number of imperfections per 10 meters of this fabric.
-(Try functions sum( ), weighted.mean( ), c(a %*% b) to find expected value/mean.","Consider that X is the time (in minutes) that a person has to wait in order to take a flight. If each flight takes off each hour X ~ U(0, 60). Find the probability that (a) waiting time is more than 45 minutes, and (b) waiting time lies between 20 and 30 minutes.",,
+(Try functions sum( ), weighted.mean( ), c(a %*% b) to find expected value/mean.","Consider that X is the time (in minutes) that a person has to wait in order to take a flight. If each flight takes off each hour X ~ U(0, 60). Find the probability that (a) waiting time is more than 45 minutes, and (b) waiting time lies between 20 and 30 minutes.","The joint probability density of two random variables X and Y is
+f(x, y) =
+?
+???
+???
+2(2x + 3y)/5; 0 ? x, y ? 1
+0; elsewhere
+Then write a R-code to
+(i) check that it is a joint density function or not? (Use integral2())
+(ii) find marginal distribution g(x) at x = 1.
+(iii) find the marginal distribution h(y) at y = 0.
+(iv) find the expected value of g(x, y) = xy."," Use the rt(n, df) function in r to investigate the t-distribution for n = 100 and df = n ? 1 and plot
+the histogram for the same."
 "pbinom(9, size = 12, prob = 1/6) - pbinom(6, size = 12, prob = 1/6)
 Or
 dbinom(7, 12, 1/6) + dbinom(8, 12, 1/6) + dbinom(9, 12, 1/6)","x<- c(0,1,2,3,4)
@@ -16,7 +28,41 @@ print(weighted.mean(x,p))
 print(c(x%*%p))","x1_punif <- punif(45,0,60,lower.tail= FALSE)
 x2_punif <- punif(30,0,60,lower.tail = TRUE) - punif(20,0,60,lower.tail = TRUE)
 print(x1_punif)
-print(x2_punif)",,
+print(x2_punif)","library(pracma)
+
+f <- function(x,y){
+  2*(2*x+3*y)/5
+}
+
+g <- function(y){
+  2*(2+3*y)/5
+}
+
+h <- function(x){
+  2*(2*x)/5
+}
+
+e <- function(x,y){
+  2*x*y*(2*x+3*y)/5
+}
+
+val <- integral2(f,0,1,0,1)$Q;
+
+if(val == '1'){
+  sprintf('Yes it is a joint pdf');
+}else{
+  sprintf('No, it is not a joint pdf');
+}
+
+g_x <- integral(g,0,1);
+
+h_y <- integral(h,0,1);
+
+E_xy <- integral2(e,0,1,0,1)$Q;","n=100
+df=n-1
+ samples=rt(n,df)
+ samples
+  hist(samples)"
 "Assume that the test scores of a college entrance exam fits a normal distribution. Furthermore, the mean test score is 72, and the standard deviation is 15.2. What is the percentage of students scoring 84 or more in the exam?","The time T, in days, required for the completion of a contracted project is a random
 variable with probability density function f(t) = 0.1 e(-0.1t)
 for t > 0 and 0 otherwise. Find
@@ -28,7 +74,16 @@ variable with parameter ? = 1/2.
 (c) Find the probability that a repair time takes at most 3 hours.
 (d) Plot the graph of cumulative exponential probabilities for 0 ? x ? 5.
 (e) Simulate 1000 exponential distributed random numbers with ? = ½ and plot the
-simulated data.",,
+simulated data.","The joint probability mass function of two random variables X and Y is
+f(x, y) = {(x + y)/30; x = 0, 1, 2, 3; y = 0, 1, 2}
+Then write a R-code to
+(i) display the joint mass function in rectangular (matrix) form.
+(ii) check that it is joint mass function or not? (use: Sum())
+(iii) find the marginal distribution g(x) for x = 0, 1, 2, 3. (Use:apply())
+(iv) find the marginal distribution h(y) for y = 0, 1, 2. (Use:apply())
+(v) find the conditional probability at x = 0 given y = 1.
+(vi) find E(x), E(y), E(xy), V ar(x), V ar(y), Cov(x, y) and its correlation coefficient."," Use the rchisq(n, df) function in r to investigate the chi-square distribution with n = 100 and
+df = 2, 10, 25."
 "pnorm(84, 72, 15.2, lower.tail = FALSE)
 print(pnorm)","f<-function(t)
 {
@@ -52,7 +107,61 @@ set.seed(500)
 
 N <- 1000
 y_rexp <- rexp(N, rate = 1/2)
-plot(density(y_rexp))",,
+plot(density(y_rexp))","f <- function(x,y){
+  (x + y)/30;
+}
+
+p <- function (x,y){
+  x*y*(x+y)/30
+}
+
+m <- matrix(c(f(0,0:2),f(1,0:2),f(2,0:2),f(3,0:2)),nrow=4,ncol=3,byrow = TRUE);
+m;
+
+if(sum(m)==1){
+  sprintf('It is a joint mass function\n');
+}else{
+  sprintf('It is not a joint mass function');
+}
+
+g_x <- apply(m,1,sum);
+g_x;
+
+h_y <- apply(m,2,sum);
+h_y;
+
+cond_prob = m[1,2]/h_y[2];
+cond_prob;
+
+x <- c(0:3);
+E_x <- sum(x*g_x);
+E_x;
+
+E_x_2 <- sum(x*x*g_x);
+var_x <- E_x_2 - E_x^2;
+var_x;
+
+y <- c(0:2);
+E_y <- sum(y*h_y);
+E_y;
+
+E_y_2 <- sum(y*y*h_y);
+var_y <- E_y_2 - E_y^2;
+var_y;
+
+E_xy <- sum(matrix(c(p(0,0:2),p(1,0:2),p(2,0:2),p(3,0:2)),nrow=4,ncol=3,byrow = TRUE));
+E_xy;
+
+cov_xy = E_xy - E_x*E_y;
+cov_xy;
+
+correlation_coeff = cov_xy/(sqrt(var_x*var_y));
+correlation_coeff;","n=100
+ df=c(2,10,25)
+ 
+ rchisq(n,df[1])
+ rchisq(n,df[2])
+ rchisq(n,df[3])"
 "On the average, five cars arrive at a particular car wash every hour. Let X count the
 number of cars that arrive from 10AM to 11AM, then X ?Poisson(? = 5). What is
 probability that no car arrives during this time. Next, suppose the car wash above
@@ -68,7 +177,14 @@ Find the expected value of Y.","The lifetime of certain equipment is described b
 Gamma distribution with parameters ? = 2 and ? = 1/3.
 (a) Find the probability that the lifetime of equipment is (i) 3 units of time, and (ii)
 at least 1 unit of time.
-(b) What is the value of c, if P(X ? c) ? 0.70? (Hint: try quantile function qgamma())",,
+(b) What is the value of c, if P(X ? c) ? 0.70? (Hint: try quantile function qgamma())",," Write a r-code
+(i) To find the 95th percentile of the F-distribution with (10, 20) degrees of freedom.
+(ii) To calculate the area under the curve for the interval [0, 1.5] and the interval [1.5, +?) of
+a F-curve with v1 = 10 and v2 = 20 (USE pf()).
+(iii) To calculate the quantile for a given area (= probability) under the curve for a F-curve
+with v1 = 10 and v2 = 20 that corresponds to q = 0.25, 0.5, 0.75 and 0.999. (use the qf())
+(iv) To generate 1000 random values from the F-distribution with v1 = 10 and v2 = 20 (use
+rf())and plot a histogram."
 "dpois(0, 5)
 
 dpois(48, 50) + dpois(49, 50) + dpois(50, 50)","x<-c(0,1,2,3)
@@ -82,7 +198,26 @@ x2<- pgamma(1,shape = 2,scale = 1/3,lower.tail = FALSE)
 print(x2)
 
 c_val <- qgamma(0.7,shape =2,scale = 1/3)
-print(c_val)",,
+print(c_val)",,"#i
+qf(.95, df1=10, df2=20)
+ 
+#ii
+x = 1.5
+v1 = 10
+v2 = 20
+# interval $[0,1.5]
+pf(x, df = v1, df2 = v2, lower.tail = TRUE) 
+# interval $[1.5,+inf)
+pf(x, df = v1, df2 = v2, lower.tail = FALSE)
+ 
+#iii
+q <- c(0.25, 0.5, 0.75, 0.999)
+v1=10
+v2=20
+qf(q[1], df1 = v1, df2 = v2, lower.tail = TRUE)
+qf(q[2], df1 = v1, df2 = v2, lower.tail = TRUE)
+qf(q[3], df1 = v1, df2 = v2, lower.tail = TRUE)
+qf(q[4], df1 = v1, df2 = v2, lower.tail = TRUE)"
 " Suppose in a certain shipment of 250 Pentium processors there are 17 defective processors. A quality control consultant randomly collects 5 processors for inspection to
 determine whether or not they are defective. Let X denote the number of defectives
 in the sample. Find the probability of exactly 3 defectives in the sample, that is, find
